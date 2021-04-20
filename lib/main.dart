@@ -1,4 +1,6 @@
 
+import 'dart:collection';
+
 import 'package:calculator_bmi/PortraitModeMixin.dart';
 import 'package:input_calculator/input_calculator.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +28,15 @@ class HomeActivity extends StatefulWidget {
 class _HomeActivityState extends State<HomeActivity> with PortraitStatefulModeMixin<HomeActivity>{
 
 
+  final fieldText = TextEditingController();
+
+  void clearText() {
+    fieldText.clear();
+  }
+
   String equation = "0";
+  String lastValue = "0";
+  List<String> history = ["",""];
   String result = "0";
   double numOne = 0;
   String expression = "";
@@ -45,6 +55,7 @@ class _HomeActivityState extends State<HomeActivity> with PortraitStatefulModeMi
         expression = equation;
         expression = expression.replaceAll("x", "*");
         expression = expression.replaceAll("÷", "/");
+        equation = "";
         // expression = expression.replaceAll("%", "/");
 
         try{
@@ -54,6 +65,10 @@ class _HomeActivityState extends State<HomeActivity> with PortraitStatefulModeMi
           ContextModel cm = ContextModel();
 
           result = "${exp.evaluate(EvaluationType.REAL, cm)}";
+
+          history[0] = history[1];
+          history[1] = "$expression = $result";
+
 
         }catch(e){
           result = "Error";
@@ -80,6 +95,8 @@ class _HomeActivityState extends State<HomeActivity> with PortraitStatefulModeMi
           equation = buttonText;
         }else {
           equation = equation + buttonText;
+          lastValue = equation + buttonText;
+
         }
       }
 
@@ -266,10 +283,15 @@ class _HomeActivityState extends State<HomeActivity> with PortraitStatefulModeMi
               children: <Widget>[
                 Container(
                   child:FlatButton(onPressed: null,
-                          child: Text("",style: TextStyle(
-                            fontSize: 20.00,
-                            color: Colors.grey[500],
-                          ),
+                          child: Align( alignment: Alignment.bottomRight,
+                            child: Text(
+                              // "$lastValue"+"="+"$result",
+                              history[0],
+                              style: TextStyle(
+                              fontSize: 20.00,
+                              color: Colors.grey[500],
+                            ),
+                            ),
                           )
                   // alignment: Alignment.bottomCenter,
                   // padding: EdgeInsets.symmetric(horizontal: 10, vertical: 41),
@@ -280,6 +302,20 @@ class _HomeActivityState extends State<HomeActivity> with PortraitStatefulModeMi
                   // ),
                 ),
                 ),
+                Container(child:FlatButton(onPressed: null,
+                    child: Align( alignment: Alignment.bottomRight,
+                  child: Text(
+                    // "$lastValue"+"="+"$result",
+                    history[1],
+                    style: TextStyle(
+                      fontSize: 20.00,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ))
+
+                ),
+
                 // Expanded(
                 //
                 //     child: Divider(
